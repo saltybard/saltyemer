@@ -46,6 +46,14 @@ Circle.prototype.setNotIt = function () {
     this.visualRadius = 500;
 };
 
+Circle.prototype.setDead = function () {
+    this.it = false;
+    this.leader = false;
+    this.color = 2;
+    this.pause = true;
+    this.pauseTime = 10000000; 
+};
+
 Circle.prototype.setLeader = function () { 
     //this.flock = 1; 
     this.it = false;
@@ -124,14 +132,14 @@ Circle.prototype.update = function () {
                 this.y += this.velocity.y * this.game.clockTick;
                 ent.x += ent.velocity.x * this.game.clockTick;
                 ent.y += ent.velocity.y * this.game.clockTick;
-                if (this.it) {
+                if (this.it && ent.leader) {
                     //this.setNotIt();
                     this.removeFromWorld = true; 
-                    ent.setIt();
+                    ent.setDead();
                     //pause the it entity so it can't chain reaction 
                 }
-                else if (ent.it) {
-                    this.setIt();
+                else if (ent.it && this.leader) {
+                    this.setDead();
                     ent.removeFromWorld = true;
                     //ent.setNotIt();
                 }
@@ -149,8 +157,8 @@ Circle.prototype.update = function () {
                     this.velocity.x += difX * acceleration / (dist*dist);
                     this.velocity.y += difY * acceleration / (dist * dist);
                     var speed = Math.sqrt(this.velocity.x*this.velocity.x + this.velocity.y*this.velocity.y);
-                    if (speed > maxSpeed) {
-                        var ratio = maxSpeed / speed;
+                    if (speed > predMaxSpeed) {
+                        var ratio = predMaxSpeed / speed;
                         this.velocity.x *= ratio;
                         this.velocity.y *= ratio;
                     }
@@ -223,6 +231,7 @@ function getRandomIntInclusive(min, max) {
 var friction = 1;
 var acceleration = 1000000;
 var maxSpeed = 200;
+var predMaxSpeed = 300;
 
 var ASSET_MANAGER = new AssetManager();
 
